@@ -153,6 +153,7 @@ type Terminal struct {
 	slab         *util.Slab
 	theme        *tui.ColorTheme
 	tui          tui.Renderer
+	withIndex    bool
 }
 
 type selectedItem struct {
@@ -502,6 +503,7 @@ func NewTerminal(opts *Options, eventBox *util.EventBox) *Terminal {
 		startChan:   make(chan bool, 1),
 		killChan:    make(chan int),
 		tui:         renderer,
+		withIndex:   opts.Index,
 		initFunc:    func() { renderer.Init() }}
 	t.prompt, t.promptLen = t.parsePrompt(opts.Prompt)
 	t.pointer, t.pointerLen = t.processTabs([]rune(opts.Pointer), 0)
@@ -624,12 +626,20 @@ func (t *Terminal) output() bool {
 	if !found {
 		current := t.currentItem()
 		if current != nil {
-			t.printer(current.AsString(t.ansi))
+			output := current.AsString(t.ansi)
+			if t.withIndex {
+				output = fmt.Sprint(current.Index()+1) + "\t" + output
+			}
+			t.printer(output)
 			found = true
 		}
 	} else {
 		for _, sel := range t.sortSelected() {
-			t.printer(sel.item.AsString(t.ansi))
+			output := sel.item.AsString(t.ansi)
+			if t.withIndex {
+				output = fmt.Sprint(sel.item.Index()+1) + "\t" + output
+			}
+			t.printer(output)
 		}
 	}
 	return found
