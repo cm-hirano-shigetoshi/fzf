@@ -228,6 +228,7 @@ type Options struct {
 	Tabstop     int
 	ClearOnExit bool
 	Version     bool
+	Index       bool
 }
 
 func defaultPreviewOpts(command string) previewOpts {
@@ -287,7 +288,8 @@ func defaultOptions() *Options {
 		Unicode:     true,
 		Tabstop:     8,
 		ClearOnExit: true,
-		Version:     false}
+		Version:     false,
+		Index:       false}
 }
 
 func help(code int) {
@@ -1354,6 +1356,8 @@ func parseOptions(opts *Options, allArgs []string) {
 			opts.ClearOnExit = false
 		case "--version":
 			opts.Version = true
+		case "--index":
+			opts.Index = true
 		default:
 			if match, value := optString(arg, "--algo="); match {
 				opts.FuzzyAlgo = parseAlgo(value)
